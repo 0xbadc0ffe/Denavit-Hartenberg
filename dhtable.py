@@ -1,9 +1,12 @@
-import numpy as np # Scientific computing libraryù
+import numpy as np 
 import os
 import time
  
 
 def mat_str(mat, numspace=4 ,trunc=False, large=False):
+    # convert matrix in a string, eventually truncating its values (or making them int with
+    # trunc = int or trunc = "int". The option large is made to fit any value length ... but it's large ...
+    # numspace parameter specify the number of space IN which print the value, or another spacing in large mode
     res = ""
     if isinstance(trunc, int):
         if numspace < trunc + 3:
@@ -35,10 +38,11 @@ def mat_str(mat, numspace=4 ,trunc=False, large=False):
     return res
 
 def print_mat(mat, numspace=4 ,trunc=False, large=False):
+    # stringify the matrix and print it
     print(mat_str(mat, numspace=numspace, trunc=trunc, large=large))
 
 def truncate(f, n):
-    '''Truncates/pads a float f to n decimal places without rounding'''
+    #Truncates/pads a float f to n decimal places without rounding
     s = '{}'.format(f)
     if 'e' in s or 'E' in s:
         return '{0:.{1}f}'.format(f, n)
@@ -46,11 +50,12 @@ def truncate(f, n):
     return '.'.join([i, (d+'0'*n)[:n]])
 
 def hom_transf_matrix( joint1, joint2 ):
-    # compute homogeneous transformation matrix between consecutive joints
+    # compute homogeneous transformation matrix between consecutive joints frame vectors
     # TODO, possible only if implementing joint reference parameters (from which to derive dh parameters)
     return 
 
 def gen_dh_tabel(joint_list):
+    # generates the Denavit–Hartenberg parameters table from the joint obj list
     # TABLE ENTRIES: theta, alpha, a, d
     dh_table = []
     for joint in joint_list:
@@ -69,6 +74,7 @@ def gen_hom_matrix_from_table(index, dh_table):
     return hom_mat
 
 def input_joint_list(joint_list=[]):
+    # a simple bash interface used to take the joints parameters in input
     print("\nHi, press Enter to start ...\n")
     input()
     os.system('clear')
@@ -115,8 +121,6 @@ def input_joint_list(joint_list=[]):
                         input("\n\nPress Enter to return\n\n")
                         os.system("clear")
                         continue
-
-                            
                             
                     else:
                         print("\nJoint list is empty ...")
@@ -124,7 +128,6 @@ def input_joint_list(joint_list=[]):
                         os.system("clear")
                         continue
                         
-                    
             if sw:
                 # Addin a joint
                 os.system('clear')
@@ -189,6 +192,7 @@ def input_joint_list(joint_list=[]):
             
 
 def close(timesl=1):
+    # close the program
     os.system('clear')
     print("\n\n\n           Bye         ,(è >è)/\n\n\n")
     time.sleep(timesl)
@@ -196,6 +200,7 @@ def close(timesl=1):
     exit()
 
 def print_joint_list(joint_list):
+    # print the joint list
     print("\nJoint List:\n")
     for j in joint_list:
         print()
@@ -203,6 +208,11 @@ def print_joint_list(joint_list):
         print()
 
 def compute_all(joint_list, trunc=3, large=False):
+    # Firstly it computes all the relative frames hom. transformation [Ai-1->i]
+    # Then it generate the final transformation from the starting joint frame to the last joint frame
+    # Theoretically there could be some other (constant) transformation from an eventual base frame to the starting 
+    # joint frame and from the last joint frame to the effector frame ... but it's all about pre and post multiply 
+    # by 2 constant matrices that depend on base and effector frames choise
     print_joint_list(joint_list)
     input("\n\nPress Enter to compute all homogeneous transformation matrices\n\n")
     os.system("clear")
@@ -226,6 +236,7 @@ def compute_all(joint_list, trunc=3, large=False):
 
 
 class Joint():
+    # This class define the joint characteristics given by the D-H parameters
 
     def __init__(self, num, theta, alpha, a, d, give_deg2rad=True):
         self.num = num                          # joint number
@@ -242,6 +253,7 @@ class Joint():
 
 
     def gen_hom_matrix(self):
+        # generate the homogeneous transformation matrix
         hom_mat = np.array([[np.cos(self.theta), -np.sin(self.theta) * np.cos(self.alpha), np.sin(self.theta) * np.sin(self.alpha), self.a * np.cos(self.theta) ],
                       [np.sin(self.theta), np.cos(self.theta) * np.cos(self.alpha), -np.cos(self.theta) * np.sin(self.alpha), self.a * np.sin(self.theta) ],
                       [0, np.sin(self.alpha), np.cos(self.alpha), self.d ],
@@ -262,16 +274,22 @@ class Joint():
 
 
 '''
-# create a Joint
+Another way to compute stuff
+
+# create a Joint obj
 joint1 = Joint(1, 90, 90, 0, 2)
+
 # print a matrix truncating at 3rd decimal
 print_mat(joint1.hom_mat, trunc=3)
+
 # adding joint to joint list
 joint_list = [joint1]
+
 # generate dh table
 dh_table = gen_dh_tabel(joint_list)
 print(dh_table)
-# generate and print the homogeneous transf. matrix from the dh table
+
+# generate and print the homogeneous transf. matrix from the dh table and the hom_mat field of the Joint objects
 print_mat(gen_hom_matrix_from_table(0, dh_table), trunc=3)            
 '''
 
@@ -283,8 +301,10 @@ if __name__ == "__main__":
 
     # generate joint list and data
     joint_list = input_joint_list()
+    
     # compute all transformations
     hom_0_n = compute_all(joint_list, trunc=3)
+    
     input("\nPress Enter to exit\n\n")
     close()
 
