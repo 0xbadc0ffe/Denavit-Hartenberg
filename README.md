@@ -13,4 +13,11 @@ A small program able to give the homogeneous transformation matrix from the end 
 
 	https://numpy.org/install/
 	
+	On Windows, if you got some errors from the numpy module this may be
+	due to some Windows bug with numpy. In that case i suggest to install 
+	a previous version, like:
+	
+	pip uninstall numpy
+	pip install numpy==1.19.3
+	
 
