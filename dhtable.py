@@ -29,7 +29,17 @@ def mat_str(mat, numspace=4 ,trunc=False, large=False):
             if trunc == "int" or trunc == int:
                 e = int(e)
             elif isinstance(trunc, int) and trunc > 0:
+                if e - int(e) >= float('0.'+'9'*trunc):
+                    # small correction for x.9999... elements, eg e=x.999314 trunc=3 => e= x+1
+                    e = int(e) + 1
                 e = truncate(e, trunc)
+                # removing the minus if e contains only zeros
+                if e.replace('0','') == '-.':
+                    e = e[1:]
+                # if x.000 => x
+                if '.'+'0'*trunc in e:
+                    e = e[: -trunc - 1]
+                    
             if large:
                 res += " "*(distances[i]+ numspace - len(str(e))) + f"{e}"
             else:
