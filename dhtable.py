@@ -85,6 +85,7 @@ def gen_hom_matrix_from_table(index, dh_table):
 
 def input_joint_list(joint_list=[]):
     # a simple bash interface used to take the joints parameters in input
+    global baseframe, effectorframe, b_e_changed
     print("\nHi, press Enter to start ...\n")
     input()
     os.system('clear')
@@ -93,10 +94,17 @@ def input_joint_list(joint_list=[]):
         ans = { "1": True, "Y": True, "y": True, "yes": True,
                 "0": False, "N": False, "n": False, "no": False,
                 "2": "status", "S": "status", "s": "status", "status": "status",
-                "3": "remove", "R": "remove", "r": "remove", "remove": "remove"}
+                "3": "remove", "R": "remove", "r": "remove", "remove": "remove",
+                "4": "baseframe", "B": "baseframe", "b": "baseframe", "baseframe": "baseframe",
+                "5": "effectorframe", "E": "effectorframe", "e": "effectorframe", "effectorframe": "effectorframe"
+                    }
         
         print(f"\nCurrent number of joints: {len(joint_list)}")
-        inp = input("\nWould you like to add a new joint?    \n\n1/Y/yes:     yes            0/N/no:      no    \n\n2/S/status:  show status    3/R/remove:  remove element  \n\n\n")
+        print("\nWould you like to add a new joint?    \n\n")
+        print("1/Y/yes:        yes                   0/N/no:        no, compute  \n\n")
+        print("2/S/status:     show status           3/R/remove:    remove joint\n\n")
+        print("4/B/baseframe:  change base frame     5/E/effector:  change effector frame\n\n\n")
+        inp = input()
         try:
             sw = ans[inp]
             if isinstance(sw, str):
@@ -106,6 +114,10 @@ def input_joint_list(joint_list=[]):
                         print_joint_list(joint_list)
                     else:
                         print("\nJoint list is empty ...")
+                    print("\n\n[Base Frame transformation]:")
+                    print_mat(baseframe, trunc=3)
+                    print("\n\n[Effector Frame transformation]:")
+                    print_mat(effectorframe, trunc=3)
                     input("\n\nPress Enter to return\n\n")
                     os.system("clear")
                     continue
@@ -126,6 +138,9 @@ def input_joint_list(joint_list=[]):
                         
                         
                         joint_list.pop(n-1)
+                        # renaming joints
+                        for i in range(len(joint_list)):
+                            joint_list[i].num = i + 1
                         os.system("clear")
                         print("\nJoint successfully removed!")
                         input("\n\nPress Enter to return\n\n")
@@ -137,6 +152,71 @@ def input_joint_list(joint_list=[]):
                         input("\n\nPress Enter to return\n\n")
                         os.system("clear")
                         continue
+                
+                if sw == "baseframe":
+                    # Takes hom. transformation matrix from baseframe to starting joint in input
+                    os.system("clear")
+                    print("\nDescribe the homogeneous transformation matrix from base frame to the starting joint\n\n")
+                    frame_mat = []
+                    for i in range(4):
+                        while(True):
+                            r_i = input(f"[Row {i+1}]  |  ")
+                            ans = input("Enter to confirm, \"r\" to repeat\n")
+                            if ans != "r":
+                                try:
+                                    r_i = r_i.split()
+                                    if len(r_i) != 4 :
+                                        print("Enter 4 numbers      e.g 1 2.4 0 0.93\n")
+                                        continue
+                                    frame_mat_line = []
+                                    for number in r_i:
+                                        frame_mat_line.append(float(number))
+                                    frame_mat.append(frame_mat_line)
+                                    break
+                                except ValueError:
+                                    print("Wrong number format\n")
+                                    continue
+
+                    baseframe = np.array(frame_mat)
+                    b_e_changed = True
+                    os.system("clear")
+                    print()
+                    print_mat(baseframe, trunc=3)
+                    input("\nPress Enter to return ...")
+                    os.system("clear")
+                    continue
+                if sw == "effectorframe":
+                    # Takes hom. transformation matrix from ending joint to effector frame in input
+                    os.system("clear")
+                    print("\nDescribe the homogeneous transformation matrix from the ending joint to the effector frame\n\n")
+                    frame_mat = []
+                    for i in range(4):
+                        while(True):
+                            r_i = input(f"[Row {i+1}]  |  ")
+                            ans = input("Enter to confirm, \"r\" to repeat\n")
+                            if ans != "r":
+                                try:
+                                    r_i = r_i.split()
+                                    if len(r_i) != 4 :
+                                        print("Enter 4 numbers      e.g 1 2.4 0 0.93\n")
+                                        continue
+                                    frame_mat_line = []
+                                    for number in r_i:
+                                        frame_mat_line.append(float(number))
+                                    frame_mat.append(frame_mat_line)
+                                    break
+                                except ValueError:
+                                    print("Wrong number format\n")
+                                    continue
+
+                    effectorframe = np.array(frame_mat)
+                    b_e_changed = True
+                    os.system("clear")
+                    print()
+                    print_mat(effectorframe, trunc=3)
+                    input("\nPress Enter to return ...")
+                    os.system("clear")
+                    continue
                         
             if sw:
                 # Addin a joint
@@ -220,9 +300,8 @@ def print_joint_list(joint_list):
 def compute_all(joint_list, trunc=3, large=False):
     # Firstly it computes all the relative frames hom. transformation [Ai-1->i]
     # Then it generate the final transformation from the starting joint frame to the last joint frame
-    # Theoretically there could be some other (constant) transformation from an eventual base frame to the starting 
-    # joint frame and from the last joint frame to the effector frame ... but it's all about pre and post multiply 
-    # by 2 constant matrices that depend on base and effector frames choise
+    # IF a baseframe or an effectorframe are given this function also computes the Hom transformation between 
+    # base and effector frames
     print_joint_list(joint_list)
     input("\n\nPress Enter to compute all homogeneous transformation matrices\n\n")
     os.system("clear")
@@ -238,8 +317,18 @@ def compute_all(joint_list, trunc=3, large=False):
     hom_0_n = hom_list[0]
     for h in hom_list[1:]:
         hom_0_n = hom_0_n @ h
-    
     print_mat(hom_0_n, trunc=trunc, large=large)
+    
+    global baseframe, effectorframe, b_e_changed
+    if b_e_changed:
+        input("\nPress Enter to show next ...\n")   
+        os.system("clear")
+    
+        print(f"\nTransformation base frame -> effector frame:\n")
+        hom_b_e = baseframe @ hom_0_n @ effectorframe
+        print_mat(hom_b_e, trunc=trunc, large=large)
+        return hom_b_e
+    
     return hom_0_n
 
 
@@ -308,6 +397,12 @@ print_mat(gen_hom_matrix_from_table(0, dh_table), trunc=3)
 ###### MAIN
 
 if __name__ == "__main__":
+    
+    # Initializing Base and Effector frames
+    baseframe = np.identity(4)
+    effectorframe = np.identity(4)
+    # b_e_changed keeps track of baseframe or effectorframe changes
+    b_e_changed = False 
 
     # generate joint list and data
     joint_list = input_joint_list()
