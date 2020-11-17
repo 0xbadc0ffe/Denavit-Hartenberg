@@ -14,6 +14,3 @@ A small program able to give the homogeneous transformation matrix from the end 
 	https://numpy.org/install/
 	
 
-## Alert
-
-For Windows users, change all "clear" in "cls"

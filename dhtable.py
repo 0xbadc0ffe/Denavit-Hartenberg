@@ -1,7 +1,15 @@
 import numpy as np 
 import os
 import time
- 
+import platform
+
+if platform.system() == 'Windows':
+    CLEAR_STR = "cls" 
+else:
+    CLEAR_STR = "clear"
+    
+    
+print(platform.system())
 
 def mat_str(mat, numspace=4 ,trunc=False, large=False):
     # convert matrix in a string, eventually truncating its values (or making them int with
@@ -88,7 +96,7 @@ def input_joint_list(joint_list=[]):
     global baseframe, effectorframe, b_e_changed
     print("\nHi, press Enter to start ...\n")
     input()
-    os.system('clear')
+    os.system(CLEAR_STR)
     #joint_list = []
     while(True):
         ans = { "1": True, "Y": True, "y": True, "yes": True,
@@ -109,7 +117,7 @@ def input_joint_list(joint_list=[]):
             sw = ans[inp]
             if isinstance(sw, str):
                 if sw == "status":
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     if len(joint_list) > 0:
                         print_joint_list(joint_list)
                     else:
@@ -119,10 +127,10 @@ def input_joint_list(joint_list=[]):
                     print("\n\n[Effector Frame transformation]:")
                     print_mat(effectorframe, trunc=3)
                     input("\n\nPress Enter to return\n\n")
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     continue
                 if sw == "remove":
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     if len(joint_list) > 0:
                         print_joint_list(joint_list)
                         while True:
@@ -141,21 +149,21 @@ def input_joint_list(joint_list=[]):
                         # renaming joints
                         for i in range(len(joint_list)):
                             joint_list[i].num = i + 1
-                        os.system("clear")
+                        os.system(CLEAR_STR)
                         print("\nJoint successfully removed!")
                         input("\n\nPress Enter to return\n\n")
-                        os.system("clear")
+                        os.system(CLEAR_STR)
                         continue
                             
                     else:
                         print("\nJoint list is empty ...")
                         input("\n\nPress Enter to return\n\n")
-                        os.system("clear")
+                        os.system(CLEAR_STR)
                         continue
                 
                 if sw == "baseframe":
                     # Takes hom. transformation matrix from baseframe to starting joint in input
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     print("\nDescribe the homogeneous transformation matrix from base frame to the starting joint\n\n")
                     frame_mat = []
                     for i in range(4):
@@ -179,15 +187,15 @@ def input_joint_list(joint_list=[]):
 
                     baseframe = np.array(frame_mat)
                     b_e_changed = True
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     print()
                     print_mat(baseframe, trunc=3)
                     input("\nPress Enter to return ...")
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     continue
                 if sw == "effectorframe":
                     # Takes hom. transformation matrix from ending joint to effector frame in input
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     print("\nDescribe the homogeneous transformation matrix from the ending joint to the effector frame\n\n")
                     frame_mat = []
                     for i in range(4):
@@ -211,16 +219,16 @@ def input_joint_list(joint_list=[]):
 
                     effectorframe = np.array(frame_mat)
                     b_e_changed = True
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     print()
                     print_mat(effectorframe, trunc=3)
                     input("\nPress Enter to return ...")
-                    os.system("clear")
+                    os.system(CLEAR_STR)
                     continue
                         
             if sw:
                 # Addin a joint
-                os.system('clear')
+                os.system(CLEAR_STR)
                 index = len(joint_list) + 1
                 print(f"\nJoint n° {index}:\n")
                 while True: 
@@ -264,29 +272,29 @@ def input_joint_list(joint_list=[]):
                     joint = Joint(index, theta, alpha, a, d)
                     joint_list.append(joint)
                 
-                os.system('clear')
+                os.system(CLEAR_STR)
                 continue
 
             else:
                 if not len(joint_list):
                     close()
                 else:
-                    os.system('clear')
+                    os.system(CLEAR_STR)
                     return joint_list
         except KeyError:
-            os.system("clear")
+            os.system(CLEAR_STR)
             print("\nPlease use only the given possible answers\n")
             input("\n\nPress Enter to return\n\n")
-            os.system("clear")
+            os.system(CLEAR_STR)
             continue
             
 
 def close(timesl=1):
     # close the program
-    os.system('clear')
+    os.system(CLEAR_STR)
     print("\n\n\n           Bye         ,(è >è)/\n\n\n")
     time.sleep(timesl)
-    os.system('clear')
+    os.system(CLEAR_STR)
     exit()
 
 def print_joint_list(joint_list):
@@ -304,14 +312,14 @@ def compute_all(joint_list, trunc=3, large=False):
     # base and effector frames
     print_joint_list(joint_list)
     input("\n\nPress Enter to compute all homogeneous transformation matrices\n\n")
-    os.system("clear")
+    os.system(CLEAR_STR)
     hom_list = []
     for j in joint_list:
         print(f"\nMatrix A{j.num - 1}->{j.num}(q{j.num})\n")
         print_mat(j.hom_mat, trunc=trunc, large=large)
         hom_list.append(j.hom_mat)
         input("\nPress Enter to show next ...\n")   
-        os.system("clear")
+        os.system(CLEAR_STR)
     
     print(f"\nTransformation Frame {0} -> Frame {len(joint_list)}:\n")
     hom_0_n = hom_list[0]
@@ -322,7 +330,7 @@ def compute_all(joint_list, trunc=3, large=False):
     global baseframe, effectorframe, b_e_changed
     if b_e_changed:
         input("\nPress Enter to show next ...\n")   
-        os.system("clear")
+        os.system(CLEAR_STR)
     
         print(f"\nTransformation base frame -> effector frame:\n")
         hom_b_e = baseframe @ hom_0_n @ effectorframe
