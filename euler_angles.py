@@ -19,7 +19,6 @@ eulers.append(float(input("\nangle 1 (degrees): ")))
 eulers.append(float(input("\nangle 2 (degrees): ")))
 eulers.append(float(input("\nangle 3 (degrees): ")))
 
-print(eulers)
 rotation_matrix = euler2matrix(eulers, axes=conv, extrinsic=True, positive_ccw=True)
 
 rotation_matrix = np.matrix(rotation_matrix)
