@@ -22,7 +22,8 @@ eulers.append(float(input("\nangle 3 (degrees): ")))
 try:
     rotation_matrix = euler2matrix(eulers, axes=conv, extrinsic=True, positive_ccw=True)
 except ValueError:
-    print("Wrong Euler angles convetion: "+conv)
+    print("\nWrong Euler angles convetion "+conv)
+    exit()
 
 base_matrix= np.matrix([[1,0,0],[0,1,0],[0,0,1]])
 #rotation_matrix = np.matrix(rotation_matrix)
