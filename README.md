@@ -1,5 +1,10 @@
 # Denavit-Hartenberg
-A small program able to give the homogeneous transformation matrix from the end effector frame of a robot arm to its base frame, using Denavit-Hartenberg parameters
+dhtable.py: A small program able to give the homogeneous transformation matrix from the end effector frame of a robot arm to its base frame, using Denavit-Hartenberg parameters
+
+euler_angles.py: compute generic Euler angles transformations given the representation (e.g. "ZYZ", "ZYX") and the angles values.
+
+Newton-Raphson.py: compute Newthon-Raphson inverse kinematics. The kinematics, its Jacobian and the other parameters are hardcoded, so you need to change it manually into the code to resolve your version of the problem.
+
 
 
 ## Requirements
@@ -22,3 +27,4 @@ A small program able to give the homogeneous transformation matrix from the end 
 	pip install numpy==1.19.3
 	
 
+he 
