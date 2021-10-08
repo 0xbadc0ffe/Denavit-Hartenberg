@@ -5,7 +5,7 @@ euler_angles.py: compute generic Euler angles transformations given the represen
 
 Newton-Raphson.py: compute Newthon-Raphson inverse kinematics. The kinematics, its Jacobian and the other parameters are hardcoded, so you need to change it manually into the code to resolve your version of the problem.
 
-
+**Soon I'll update this repository with the version 2.0, in which there's symbolic computation of Direct Cinematics and more**
 
 ## Requirements
 
@@ -27,4 +27,3 @@ Newton-Raphson.py: compute Newthon-Raphson inverse kinematics. The kinematics, i
 	pip install numpy==1.19.3
 	
 
-he 
